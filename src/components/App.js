@@ -9,14 +9,12 @@ import Home from './Home'
 import NewQuestion from './NewQuestion'
 import QuestionContainer from './QuestionContainer'
 import Leaderboard from './Leaderboard'
-import { getAuthedUserFromCookie } from '../actions/authedUser'
 import { fetchInitialData } from '../actions/shared'
 import ReactCSSTransitionGroup from 'react-addons-css-transition-group';
 
 class App extends Component {
 
   componentDidMount() {
-    this.props.getAuth(getAuthedUserFromCookie())
     this.props.getData(fetchInitialData())
   }
 
@@ -48,8 +46,18 @@ class App extends Component {
         <Row>
           <Col xs={12} md={8} mdOffset={2}>
             {this.props.displayLogin
-              ? this.guestRoutes()
-              : this.authedRoutes()}
+              ? <Switch>
+                    <Route  path='/' component={SignIn} />
+                    <Redirect from='*' to='/' />
+                </Switch>
+              : <Switch>
+                    <Route exact path='/' component={Home} />
+                    <Route exact path='/add' component={NewQuestion} />
+                    <Route exact path='/leaderboard' component={Leaderboard} />
+                    <Route exact path='/questions/:questionId' component={QuestionContainer} />
+                    <Redirect from='*' to='/' />
+                </Switch>
+            }
           </Col>
         </Row>
       </Grid>
@@ -82,7 +90,7 @@ function mapStateToProps ({ authedUser, questions }) {
 function mapDispatchToProps(dispatch) {
   return {
     getData: () => dispatch(fetchInitialData()),
-    getAuth: () => dispatch(getAuthedUserFromCookie())
+
   }
 };
 
